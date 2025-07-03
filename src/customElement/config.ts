@@ -1,6 +1,17 @@
 export type Config = Readonly<{
   textElementCodename: string;
+  authUrl: string;
+  apiUrl: string; 
+  projectKey: string;
+  clientId: string;
+  clientSecret: string;
 }>;
 
 export const isConfig = (value: Readonly<Record<string, unknown>> | null) =>
-  value !== null; // use better check
+  value !== null && 
+  typeof value.authUrl === 'string' &&
+  typeof value.apiUrl === 'string' &&
+  typeof value.projectKey === 'string' &&
+  typeof value.clientId === 'string' &&
+  typeof value.clientSecret === 'string' &&
+  typeof value.textElementCodename === 'string';
