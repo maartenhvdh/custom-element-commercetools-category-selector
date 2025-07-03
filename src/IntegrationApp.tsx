@@ -37,9 +37,14 @@ function buildCategoryTree(categories: Category[]): Category[] {
   });
   const roots: Category[] = [];
   categories.forEach((cat: Category) => {
-    if (cat.parent && cat.parent.id && map[cat.parent.id]) {
-      map[cat.parent.id].children!.push(map[cat.id]!);
-    } else {
+    if (
+      cat.parent &&
+      cat.parent.id &&
+      map[cat.parent.id] !== undefined &&
+      map[cat.id] !== undefined
+    ) {
+      map[cat.parent.id]?.children!.push(map[cat.id]!);
+    } else if (map[cat.id] !== undefined) {
       roots.push(map[cat.id]!);
     }
   });
@@ -59,14 +64,11 @@ function flattenTree(nodes: Category[], depth = 0, arr: Category[] = []): Catego
 }
 
 export const IntegrationApp = () => {
-  // use this to access/modify this element's value
+  // elementValue is always a string[] (array of category IDs)
   const [elementValue, setElementValue] = useValue();
-  // get whether this element should be disabled
   const isDisabled = useIsDisabled();
-  // this custom element's configuration (defined in the content type in the Kontent.ai app)
   const config = useConfig();
 
-  // commercetools category selector state
   const [categories, setCategories] = useState<Category[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(false);
   const [categoriesError, setCategoriesError] = useState<string | null>(null);
@@ -92,9 +94,9 @@ export const IntegrationApp = () => {
       .finally(() => setLoadingCategories(false));
   }, []);
 
-  const handleChange = (event: any, value: Category[]) => {
-    // value is array of category objects
-    setElementValue(value.map(cat => cat.id));
+  // Only use value: Category[]
+  const handleChange = (_: any, value: Category[]) => {
+    setElementValue({ valueKey: value.map(cat => cat.id) });
   };
 
   return (
